@@ -1,21 +1,29 @@
 package Methods;
+
 import org.opencv.core.*;
-import org.opencv.highgui.HighGui;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
-import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static org.opencv.core.CvType.CV_8UC3;
 
 public class PixelDetect implements Runnable {
     List<Point> testpoints;
     List<List<Point>> listofpoints;
-    public PixelDetect(List<Point> testpoints,List<List<Point>> listofpoints)
+    int freespaces;
+
+    public int getFreespaces() {
+        return freespaces;
+    }
+
+    public void setFreespaces(int freespaces) {
+        this.freespaces = freespaces;
+    }
+
+    public PixelDetect(List<Point> testpoints, List<List<Point>> listofpoints)
     {
         this.testpoints = testpoints;
         this.listofpoints = listofpoints;
@@ -29,14 +37,12 @@ public void run() {
     }
     Mat frame = new Mat();
     MatOfPoint mop;
-    int freespaces;
     List<Mat> masks;
     while(camera.read(frame))
     {
         Imgproc.GaussianBlur(frame, frame, new Size(9,9),0);
         Imgproc.cvtColor(frame,frame,Imgproc.COLOR_BGR2HSV);
         masks = new ArrayList<>();
-        freespaces = 0;
         for (List<Point> fieldpoints: listofpoints
         ){
             Mat mask = new Mat(frame.size(),CV_8UC3);
@@ -78,6 +84,7 @@ public void run() {
         else
             medianv = numArrayv[numArrayv.length/2];
         Core.inRange(frame, new Scalar(medianh - 25, medians - 30, medianv - 30), new Scalar(medianh + 25, medians + 30, medianv + 30), frame);
+        this.freespaces = 0;
         for (Mat mask:masks
         ) {
             double test1 = 0;
@@ -86,7 +93,6 @@ public void run() {
                 for (int j = 0; j < mask.width(); j++) {
                     if (mask.get(i,j)[0] == 255.0)
                     {
-                        double[] testd = frame.get(i,j);
                         if(frame.get(i,j)[0] == 0) {
                             test2++;
                         }
@@ -97,10 +103,9 @@ public void run() {
             double test = test2/test1*100;
             if(test < 70)
             {
-                freespaces++;
+                this.freespaces++;
             }
         }
-        System.out.println(freespaces);
     }
         }
 }

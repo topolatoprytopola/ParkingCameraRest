@@ -15,7 +15,17 @@ public class DetectMovement implements Runnable {
     int restrictionxright;
     int restrictionytop;
     int restrictionybottom;
-    public DetectMovement(int restrictionxleft,int restrictionxright,int restrictionytop,int restrictionybottom) {
+    int how_many;
+
+    public int getHow_many() {
+        return how_many;
+    }
+
+    public void setHow_many(int how_many) {
+        this.how_many = how_many;
+    }
+
+    public DetectMovement(int restrictionxleft, int restrictionxright, int restrictionytop, int restrictionybottom) {
         this.restrictionxleft = restrictionxleft;
         this.restrictionxright = restrictionxright;
         this.restrictionytop = restrictionytop;
@@ -34,7 +44,7 @@ public class DetectMovement implements Runnable {
             return;
         }
         int j;
-        int how_many = 40;
+        this.how_many = 40;
         Mat frame;
         BackgroundSubtractor backSub;
         Mat hierarchy = new Mat();
@@ -94,22 +104,22 @@ public class DetectMovement implements Runnable {
                     if (Math.abs(lc.getY() - tmplc.getY()) < 80 && Math.abs(lc.getX() - tmplc.getX()) < 80) {
                         if (ishorizontal) {
                             if (lc.getY() > line && tmplc.getY() < line) {
-                                if (how_many > 0) {
-                                    how_many--;
+                                if (this.how_many > 0) {
+                                    this.how_many--;
                                 }
                                 i.remove();
                             } else if (lc.getY() < line && tmplc.getY() > line) {
-                                how_many++;
+                                this.how_many++;
                                 i.remove();
                             }
                         } else {
                             if (lc.getX() > line && tmplc.getX() < line) {
-                                if (how_many > 0) {
-                                    how_many--;
+                                if (this.how_many > 0) {
+                                    this.how_many--;
                                 }
                                 i.remove();
                             } else if (lc.getX() < line && tmplc.getX() > line) {
-                                how_many++;
+                                this.how_many++;
                                 i.remove();
                             }
                         }
@@ -122,7 +132,6 @@ public class DetectMovement implements Runnable {
                 locations.add(tmplc);
             }
             tmplocations.clear();
-            System.out.println(how_many);
         }
     }
 }
