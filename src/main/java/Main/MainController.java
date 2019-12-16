@@ -28,7 +28,7 @@ public class MainController {
         this.pixelDetect = new PixelDetect(addtestpoints(),addlist());
         Thread t2 = new Thread(pixelDetect);
         t2.start();
-        this.yolo = new Yolo(5);
+        this.yolo = new Yolo(30,this.addpointyolo());
         Thread t3 = new Thread(yolo);
         t3.start();
     }
@@ -45,17 +45,25 @@ public class MainController {
         switch (intid)
         {
             case 1:
-                return String.valueOf(this.detectMovement.getHow_many());
+                return String.valueOf(this.detectMovement.freespaces());
             case 2:
-                return String.valueOf(this.pixelDetect.getFreespaces());
+                return String.valueOf(this.pixelDetect.freespaces());
             case 3:
-                return String.valueOf(this.yolo.getFreespaces());
+                return String.valueOf(this.yolo.freespaces());
         }
 
 
         return "1";
     }
-    public static List<List<Point>> addlist() {
+    private List<Point> addpointyolo() {
+        List<Point> fieldpoints = new ArrayList<>();
+        fieldpoints.add(new Point(1,43));
+        fieldpoints.add(new Point(452,89));
+        fieldpoints.add(new Point(430,260));
+        fieldpoints.add(new Point(1,190));
+        return fieldpoints;
+    }
+    private List<List<Point>> addlist() {
         List<List<Point>> listofpoints = new ArrayList<>();
         List<Point> points = new ArrayList<>();
         points.add(new Point(16,63));

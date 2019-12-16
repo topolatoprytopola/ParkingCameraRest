@@ -14,6 +14,7 @@ public class PixelDetect implements Runnable {
     List<Point> testpoints;
     List<List<Point>> listofpoints;
     int freespaces;
+    List<Integer> numberofspaces;
 
     public int getFreespaces() {
         return freespaces;
@@ -27,6 +28,21 @@ public class PixelDetect implements Runnable {
     {
         this.testpoints = testpoints;
         this.listofpoints = listofpoints;
+        numberofspaces = new ArrayList<>();
+    }
+    public int freespaces() {
+        Integer[] itemsArray = new Integer[this.numberofspaces.size()];
+        itemsArray = this.numberofspaces.toArray(itemsArray);
+        if(itemsArray.length>0) {
+            Arrays.sort(itemsArray);
+            double median;
+            if (itemsArray.length % 2 == 0)
+                median = ((double) itemsArray[itemsArray.length / 2] + (double) itemsArray[itemsArray.length / 2 - 1]) / 2;
+            else
+                median = (double) itemsArray[itemsArray.length / 2];
+            return (int) median;
+        }
+        return 0;
     }
 public void run() {
     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -105,6 +121,15 @@ public void run() {
             {
                 this.freespaces++;
             }
+        }
+        if(this.numberofspaces.size()>10)
+        {
+            this.numberofspaces.remove(0);
+            this.numberofspaces.add(freespaces);
+        }
+        else
+        {
+            this.numberofspaces.add(freespaces);
         }
     }
         }

@@ -6,16 +6,16 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractor;
 import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
+
 public class DetectMovement implements Runnable {
     int restrictionxleft;
     int restrictionxright;
     int restrictionytop;
     int restrictionybottom;
     int how_many;
+    List<Integer> numberofspaces;
 
     public int getHow_many() {
         return how_many;
@@ -30,6 +30,21 @@ public class DetectMovement implements Runnable {
         this.restrictionxright = restrictionxright;
         this.restrictionytop = restrictionytop;
         this.restrictionybottom = restrictionybottom;
+        numberofspaces = new ArrayList<>();
+    }
+    public int freespaces() {
+        Integer[] itemsArray = new Integer[this.numberofspaces.size()];
+        itemsArray = this.numberofspaces.toArray(itemsArray);
+        if(itemsArray.length>0) {
+            Arrays.sort(itemsArray);
+            double median;
+            if (itemsArray.length % 2 == 0)
+                median = ((double) itemsArray[itemsArray.length / 2] + (double) itemsArray[itemsArray.length / 2 - 1]) / 2;
+            else
+                median = (double) itemsArray[itemsArray.length / 2];
+            return (int) median;
+        }
+        return 0;
     }
     public void run() {
         int line = 260;
@@ -125,6 +140,15 @@ public class DetectMovement implements Runnable {
                         }
                     }
                 }
+            }
+            if(this.numberofspaces.size()>10)
+            {
+                this.numberofspaces.remove(0);
+                this.numberofspaces.add(how_many);
+            }
+            else
+            {
+                this.numberofspaces.add(how_many);
             }
             locations.clear();
             for (location tmplc : tmplocations
