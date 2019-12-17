@@ -16,6 +16,7 @@ public class Yolo implements Runnable {
     int freespaces;
     List<Point> fieldpoints;
     List<Integer> numberofspaces;
+    String address;
 
     public int getFreespaces() {
         return freespaces;
@@ -47,11 +48,12 @@ public class Yolo implements Runnable {
         outLayers.forEach((item) -> names.add(layersNames.get(item - 1)));//unfold and create R-CNN layers from the loaded YOLO model//
         return names;
     }
-    public Yolo(int freespaces,List<Point> fieldpoints)
+    public Yolo(int freespaces,List<Point> fieldpoints, String address)
     {
         this.freespaces = freespaces;
         this.fieldpoints = fieldpoints;
         numberofspaces = new ArrayList<>();
+        this.address = address;
     }
     @Override
     public void run() {
@@ -59,7 +61,7 @@ public class Yolo implements Runnable {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         String modelWeights = "D:\\yolov3.weights";
         String modelConfiguration = "D:\\yolov3.cfg.txt";
-        VideoCapture cap = new VideoCapture("http://live.uci.agh.edu.pl/video/stream3.cgi");
+        VideoCapture cap = new VideoCapture(address);
         Mat frame = new Mat();
         Net net = Dnn.readNetFromDarknet(modelConfiguration, modelWeights);
         List<Mat> result = new ArrayList<>();

@@ -15,7 +15,12 @@ public class DetectMovement implements Runnable {
     int restrictionytop;
     int restrictionybottom;
     int how_many;
+    int objectsize;
+    Point p1;
+    Point p2;
     List<Integer> numberofspaces;
+    String address;
+    boolean ishorizontal;
 
     public int getHow_many() {
         return how_many;
@@ -25,12 +30,18 @@ public class DetectMovement implements Runnable {
         this.how_many = how_many;
     }
 
-    public DetectMovement(int restrictionxleft, int restrictionxright, int restrictionytop, int restrictionybottom) {
+    public DetectMovement(int restrictionxleft, int restrictionxright, int restrictionytop, int restrictionybottom, Point p1, Point p2, int objectsize,String address, boolean ishorizontal, int how_many) {
         this.restrictionxleft = restrictionxleft;
         this.restrictionxright = restrictionxright;
         this.restrictionytop = restrictionytop;
         this.restrictionybottom = restrictionybottom;
         numberofspaces = new ArrayList<>();
+        this.p1 = p1;
+        this.p2 = p2;
+        this.objectsize = objectsize;
+        this.address = address;
+        this.ishorizontal = ishorizontal;
+        this.how_many = how_many;
     }
     public int freespaces() {
         Integer[] itemsArray = new Integer[this.numberofspaces.size()];
@@ -47,19 +58,16 @@ public class DetectMovement implements Runnable {
         return 0;
     }
     public void run() {
-        int line = 260;
-        boolean ishorizontal = true;
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         int n = 0;
         List<location> locations = new ArrayList<>();
         List<location> tmplocations = new ArrayList<>();
-        VideoCapture camera = new VideoCapture("http://live.uci.agh.edu.pl/video/stream3.cgi");
+        VideoCapture camera = new VideoCapture(address);
         if (!camera.isOpened()) {
             System.out.println("Error! Camera can't be opened!");
             return;
         }
         int j;
-        this.how_many = 40;
         Mat frame;
         BackgroundSubtractor backSub;
         Mat hierarchy = new Mat();
@@ -105,7 +113,7 @@ public class DetectMovement implements Runnable {
                 double centerx = (boundRect[i].tl().x + boundRect[i].br().x) / 2;
                 double centery = (boundRect[i].tl().y + boundRect[i].br().y) / 2;
                 double size = boundRect[i].width * boundRect[i].height;
-                if (size > 7000) {
+                if (size > (objectsize/(centery/frame.size().height))) {
                     if (centerx > restrictionxleft && centerx < restrictionxright && centery < restrictionybottom && centery > restrictionytop) {
                         tmplocations.add(new location(centerx, centery));
                     }
@@ -117,25 +125,20 @@ public class DetectMovement implements Runnable {
                 while (i.hasNext()) {
                     tmplc = (location) i.next();
                     if (Math.abs(lc.getY() - tmplc.getY()) < 80 && Math.abs(lc.getX() - tmplc.getX()) < 80) {
+                        double s = (p2.y - p1.y) * lc.getX() + (p1.x - p2.x) * lc.getY() + (p2.x * p1.y - p1.x * p2.y);
                         if (ishorizontal) {
-                            if (lc.getY() > line && tmplc.getY() < line) {
-                                if (this.how_many > 0) {
-                                    this.how_many--;
-                                }
-                                i.remove();
-                            } else if (lc.getY() < line && tmplc.getY() > line) {
-                                this.how_many++;
-                                i.remove();
+                            if (s < 0) {
+                                how_many++;
+                            }
+                            else if (s > 0) {
+                                how_many--;
                             }
                         } else {
-                            if (lc.getX() > line && tmplc.getX() < line) {
-                                if (this.how_many > 0) {
-                                    this.how_many--;
-                                }
-                                i.remove();
-                            } else if (lc.getX() < line && tmplc.getX() > line) {
-                                this.how_many++;
-                                i.remove();
+                            if (s > 0) {
+                                how_many++;
+                            }
+                            else if (s < 0) {
+                                how_many--;
                             }
                         }
                     }

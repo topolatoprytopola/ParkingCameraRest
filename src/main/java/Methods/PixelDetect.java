@@ -15,6 +15,7 @@ public class PixelDetect implements Runnable {
     List<List<Point>> listofpoints;
     int freespaces;
     List<Integer> numberofspaces;
+    String address;
 
     public int getFreespaces() {
         return freespaces;
@@ -24,11 +25,12 @@ public class PixelDetect implements Runnable {
         this.freespaces = freespaces;
     }
 
-    public PixelDetect(List<Point> testpoints, List<List<Point>> listofpoints)
+    public PixelDetect(List<Point> testpoints, List<List<Point>> listofpoints, String address)
     {
         this.testpoints = testpoints;
         this.listofpoints = listofpoints;
         numberofspaces = new ArrayList<>();
+        this.address = address;
     }
     public int freespaces() {
         Integer[] itemsArray = new Integer[this.numberofspaces.size()];
@@ -46,7 +48,7 @@ public class PixelDetect implements Runnable {
     }
 public void run() {
     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    VideoCapture camera = new VideoCapture("http://live.uci.agh.edu.pl/video/stream3.cgi");
+    VideoCapture camera = new VideoCapture(address);
     if (!camera.isOpened()) {
         System.out.println("Error! Camera can't be opened!");
         return;
